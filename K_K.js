@@ -25,7 +25,8 @@
     displayCurrentPlayer();
 
     $('.win').dialog({
-        autoOpen: false, close:function() {
+        modal: true,
+        autoOpen: false, close: function () {
             End();
         }
     });
@@ -33,7 +34,7 @@
 
     function End() {
 
-       
+
         count = 0;
         currentPlayer = players[0];
         BoardOfCells = BoardOfCells = [
@@ -50,42 +51,39 @@
 
 
         });
-       
+
 
     }
 
 
-    function Win(sign)
-    {
+    function Win(sign) {
         var text;
         if (sign === 'O') {
             text = "Kółko";
         }
-        else
-        {
+        else {
             text = "Krzyżyk";
         }
         $('.cell').show("explode", { pieces: 16 }, 2000);
-        $(".win").text("Wygrał gracz "+text);
+        $(".win").text("Wygrał gracz " + text);
         $('.win').dialog('open');
-        End();
-        
+       
+
 
 
     }
 
     $('.end').dialog({
+        modal: true,
         autoOpen: false, close: function () {
             End();
-        }});
+        }
+    });
 
-    function CheckEnd()
-    {
+    function CheckEnd() {
 
-        if (count === 9)
-        {
+        if (count === 9) {
             $('.end').dialog('open');
-            End();
            
         }
 
@@ -204,7 +202,7 @@
         }
 
 
-      
+
 
         var x = BoardOfCells.length - 1;
         var y = 0;
@@ -247,16 +245,16 @@
                     sign = 'X';
 
                 }
+                count++;
             }
 
             SetBoard();
             CheckWinHorizontally(sign);
             CheckWinPerpendicularly(sign);
             CheckWinSlant(sign);
-            count++;
             CheckEnd();
             displayCurrentPlayer();
-            
+
         });
 
 
