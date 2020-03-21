@@ -1,18 +1,28 @@
 ﻿$(document).ready(function () {
 
     var players = [{ name: 'Kółko' }, { name: 'Krzyżyk' }];
-
+    var win = false;
+    var end = false;
     var currentPlayer = players[0];
 
     var count = 0;
 
-    var BoardOfCells = [
+    let BoardOfCells = [
 
         ["", "", ""],
         ["", "", ""],
         ["", "", ""]
 
     ];
+
+
+    //var BoardOfCellsNextMove = [
+
+    //    ["", "", ""],
+    //    ["", "", ""],
+    //    ["", "", ""]
+
+    //];
 
 
 
@@ -32,8 +42,13 @@
     });
 
 
+
+
+
     function End() {
 
+        win = false;
+        end = false;
 
         count = 0;
         currentPlayer = players[0];
@@ -64,10 +79,10 @@
         else {
             text = "Krzyżyk";
         }
-        $('.cell').show("explode", { pieces: 16 }, 2000);
+        win = true;
         $(".win").text("Wygrał gracz " + text);
         $('.win').dialog('open');
-       
+
 
 
 
@@ -82,9 +97,9 @@
 
     function CheckEnd() {
 
-        if (count === 9) {
+        if (count >= 9 && win === false) {
             $('.end').dialog('open');
-           
+
         }
 
     }
@@ -126,7 +141,7 @@
     }/////
 
 
-    function CheckWinHorizontally(sign) {
+    function CheckWinHorizontally(sign, BoardOfCells) {
 
         for (var i = 0; i < 3; i++) {
 
@@ -141,6 +156,7 @@
 
             if (k === 3) {
                 Win(sign);
+                end = true;
                 break;
             }
 
@@ -154,7 +170,7 @@
 
     }
 
-    function CheckWinPerpendicularly(sign) {
+    function CheckWinPerpendicularly(sign, BoardOfCells) {
 
 
         for (var i = 0; i < 3; i++) {
@@ -168,6 +184,7 @@
 
                 if (k === 3) {
                     Win(sign);
+                    end = true;
                     break;
                 }
 
@@ -181,7 +198,7 @@
 
     }
 
-    function CheckWinSlant(sign) {
+    function CheckWinSlant(sign, BoardOfCells) {
 
         var l = 0;
         var p = 0;
@@ -195,6 +212,7 @@
 
             if (l === 3) {
                 Win(sign);
+                end = true;
                 break;
             }
 
@@ -214,6 +232,7 @@
 
             if (p === 3) {
                 Win(sign);
+                end = true;
                 break;
             }
             x--;
@@ -224,7 +243,82 @@
 
 
 
-    }
+    }////
+
+
+
+    function checkAll(sign, BoardOfCells) {
+        SetBoard();
+        CheckWinSlant(sign, BoardOfCells);
+        CheckWinHorizontally(sign, BoardOfCells);
+        CheckWinPerpendicularly(sign, BoardOfCells);
+
+        CheckEnd();
+        displayCurrentPlayer();
+    }/////
+
+
+
+
+
+    function playWithComputer() {
+
+
+
+        $('.board').on('click', '.cell', function () {
+
+            var sign;
+            if ($(this).hasClass('cell_O') === false && $(this).hasClass('cell_X') === false) {
+
+                $(this).addClass('cell_O');
+                currentPlayer = players[1];
+                sign = 'O';
+                count++;
+                checkAll(sign, BoardOfCells);
+
+                if (end) {
+                    return false;
+                }
+                //////////////////////////////////////////
+                var x = true;
+                while (x) {
+                    var number = Math.floor(Math.random() * 8 + 0);
+                    var cells = $('.cell');
+                    var cellX = cells[number];
+
+                    if (cellX.classList.contains('cell_O') === false && cellX.classList.contains('cell_X') === false) {
+                        cellX.classList.add('cell_X');
+                        x = false;
+                    }
+
+
+
+                }
+
+
+
+
+                ////////////////////////////////////////
+                currentPlayer = players[0];
+                sign = 'X';
+                count++;
+                checkAll(sign, BoardOfCells);
+
+
+
+
+
+            }
+
+
+
+
+        });
+
+
+
+    }//////
+
 
 
     function move() {
@@ -244,14 +338,16 @@
                     currentPlayer = players[0];
                     sign = 'X';
 
+
                 }
                 count++;
             }
 
             SetBoard();
-            CheckWinHorizontally(sign);
-            CheckWinPerpendicularly(sign);
-            CheckWinSlant(sign);
+            CheckWinSlant(sign, BoardOfCells);
+            CheckWinHorizontally(sign, BoardOfCells);
+            CheckWinPerpendicularly(sign, BoardOfCells);
+
             CheckEnd();
             displayCurrentPlayer();
 
@@ -259,12 +355,48 @@
 
 
 
-    }
+    }//////
 
-    move();
 
+    $('.start').dialog({
+        modal: true,
+        buttons: [
+            {
+                text: "Dwóch graczy",
+                icon: "ui-icon-person",
+                click: function () {
+                    $(this).dialog('close');
+                    move();
+                }
+
+            },
+            {
+                text: "Gra z komputerem",
+                icon: "ui-icon-wrench",
+                click: function () {
+                    $(this).dialog('close');
+                    playWithComputer();
+                }
+
+            }
+
+
+        ]
+
+
+
+    });///
 
 
 
 
 });
+
+
+
+
+
+
+
+
+
